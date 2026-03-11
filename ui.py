@@ -15,6 +15,10 @@ from textual.work import work
 from scapy.all import IP, TCP, UDP, ICMP, DNS, sr1
 
 
+# ==========================================
+# DAY 3+4: Textual UI (Packet Builder)
+# See ui.py for the interactive TUI application
+# ==========================================
 class PktforgeApp(App):
     """
     Terminal UI Application for pktforge.
@@ -99,7 +103,11 @@ class PktforgeApp(App):
         """Return the currently selected protocol name from the RadioSet."""
         radio_set = self.query_one("#protocol_select", RadioSet)
         protocols = ["icmp", "tcp", "udp"]
-        return protocols[radio_set.pressed_index] if radio_set.pressed_index >= 0 else "icmp"
+        return (
+            protocols[radio_set.pressed_index]
+            if radio_set.pressed_index >= 0
+            else "icmp"
+        )
 
     def build_packet(self):
         """Build a Scapy packet from the current input fields. Returns the packet or None."""
@@ -145,7 +153,9 @@ class PktforgeApp(App):
             row = raw[i : i + 16]
             hex_str = " ".join(f"{b:02x}" for b in row)
             ascii_str = "".join(chr(b) if 32 <= b <= 126 else "." for b in row)
-            self.hex_preview.write(f"[cyan]{i:04x}[/cyan]  {hex_str}  [dim]{ascii_str}[/dim]")
+            self.hex_preview.write(
+                f"[cyan]{i:04x}[/cyan]  {hex_str}  [dim]{ascii_str}[/dim]"
+            )
 
     def decode_to_log(self, response):
         """Decode a response packet and write the decoded layers to the response log."""
@@ -211,9 +221,14 @@ class PktforgeApp(App):
         response = sr1(pkt, timeout=3, verbose=0)
 
         if response is None:
-            self.app.call_from_thread(self.response_log.write, "[red]No response received (timed out)[/red]")
+            self.app.call_from_thread(
+                self.response_log.write, "[red]No response received (timed out)[/red]"
+            )
         else:
-            self.app.call_from_thread(self.response_log.write, f"[green]Response: {response.summary()}[/green]")
+            self.app.call_from_thread(
+                self.response_log.write,
+                f"[green]Response: {response.summary()}[/green]",
+            )
             self.app.call_from_thread(self.decode_to_log, response)
 
     def action_clear_all(self):
