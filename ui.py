@@ -11,7 +11,7 @@ from textual.widgets import (
 )
 from textual.containers import Horizontal, Vertical
 from textual.binding import Binding
-from textual.work import work
+from textual import work
 from scapy.all import IP, TCP, UDP, ICMP, DNS, sr1
 
 
