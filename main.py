@@ -109,10 +109,6 @@ def validate_port(dport: int | None) -> bool:
 
 
 # ==========================================
-# DAY 3+4: Textual UI (Packet Builder)
-# See ui.py for the interactive TUI application
-# ==========================================
-# ==========================================
 # DAY 1: CLI Commands
 # ==========================================
 @app.command()
