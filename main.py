@@ -1,9 +1,8 @@
 import ipaddress
 from typing import Annotated
 import typer
-from textual.app import App, ComposeResult
-from textual.widgets import RichLog
 from scapy.all import *
+from ui import PktforgeApp
 
 app = typer.Typer()
 
@@ -111,25 +110,8 @@ def validate_port(dport: int | None) -> bool:
 
 # ==========================================
 # DAY 3+4: Textual UI (Packet Builder)
+# See ui.py for the interactive TUI application
 # ==========================================
-class PktforgeApp(App):
-    """
-    Terminal UI Application for pktforge.
-    Provides an interactive dashboard for packet composition, hex inspection, and response analysis.
-    """
-
-    def compose(self) -> ComposeResult:
-        """Construct the UI layout and define the widgets."""
-        # self.left_bar = RichLog(id="static", markup=True)
-        # yield self.left_bar
-        pass
-
-    def on_mount(self):
-        """Initialize UI state when the app is fully mounted."""
-        # self.left_bar.write("[green]Welcome to pktforge[/green]")
-        pass
-
-
 # ==========================================
 # DAY 1: CLI Commands
 # ==========================================
