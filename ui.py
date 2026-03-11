@@ -11,6 +11,7 @@ from textual.widgets import (
 )
 from textual.containers import Horizontal, Vertical
 from textual.binding import Binding
+from textual.work import work
 from scapy.all import IP, TCP, UDP, ICMP, DNS, sr1
 
 
@@ -124,7 +125,7 @@ class PktforgeApp(App):
             pkt = ip_layer / ICMP()
         elif protocol == "tcp":
             dport = int(port) if port.isdigit() else 80
-            tcp_flags = flags if flags else "S"
+            tcp_flags = flags.upper() if flags else "S"
             pkt = ip_layer / TCP(dport=dport, flags=tcp_flags)
         elif protocol == "udp":
             dport = int(port) if port.isdigit() else 53
@@ -202,17 +203,18 @@ class PktforgeApp(App):
             return
 
         self.response_log.write(f"\n[bold]Sending: {pkt.summary()}[/bold]")
-        self.run_worker(self._send_worker(pkt), name="send_packet", exclusive=True)
+        self._send_worker(pkt)
 
-    async def _send_worker(self, pkt):
+    @work(thread=True)
+    def _send_worker(self, pkt):
         """Background worker that sends the packet and logs the response."""
-        response = await self.run_in_thread(lambda: sr1(pkt, timeout=3, verbose=0))
+        response = sr1(pkt, timeout=3, verbose=0)
 
         if response is None:
-            self.response_log.write("[red]No response received (timed out)[/red]")
+            self.app.call_from_thread(self.response_log.write, "[red]No response received (timed out)[/red]")
         else:
-            self.response_log.write(f"[green]Response: {response.summary()}[/green]")
-            self.decode_to_log(response)
+            self.app.call_from_thread(self.response_log.write, f"[green]Response: {response.summary()}[/green]")
+            self.app.call_from_thread(self.decode_to_log, response)
 
     def action_clear_all(self):
         """Clear all input fields and logs when F2 is pressed."""
